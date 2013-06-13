@@ -83,7 +83,7 @@ class AttachmentBehavior extends ModelBehavior {
 		'prepend' => '',
 		'tempDir' => TMP,
 		'uploadDir' => '',
-		'finalPath' => '',
+		'finalPath' => 'files/uploads',
 		'dbColumn' => '',
 		'metaColumns' => array(),
 		'defaultPath' => '',
@@ -157,7 +157,6 @@ class AttachmentBehavior extends ModelBehavior {
 			}
 
 			if (!$attachment['uploadDir']) {
-				$attachment['finalPath'] = $attachment['finalPath'] ?: '/files/uploads/';
 				$attachment['uploadDir'] = WWW_ROOT . $attachment['finalPath'];
 			}
 
@@ -165,10 +164,16 @@ class AttachmentBehavior extends ModelBehavior {
 			if ($attachment['transforms']) {
 				foreach ($attachment['transforms'] as $dbColumn => $transform) {
 					$transform = Set::merge($this->_transformSettings, $transform + array(
-						'uploadDir' => $attachment['uploadDir'],
-						'finalPath' => $attachment['finalPath'],
 						'dbColumn' => $dbColumn
 					));
+
+					if (!$transform['finalPath']) {
+						$transform['finalPath'] = $attachment['finalPath'];
+					}
+
+					if (!$transform['uploadDir']) {
+						$transform['uploadDir'] = WWW_ROOT . $transform['finalPath'];
+					}
 
 					if ($transform['self']) {
 						$transform['dbColumn'] = $attachment['dbColumn'];
